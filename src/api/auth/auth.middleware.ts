@@ -17,9 +17,11 @@ export default function auth(
   if (authHeader) {
     const token = authHeader.split(' ')[1];
     const verified = verifyToken(token as string);
+    console.log('check');
     if (verified) {
       const decoded = decodeToken(token as string);
       req.user = decoded as jwt.JwtPayload;
+      console.log('check after setting req.user');
       next();
     }
   }
