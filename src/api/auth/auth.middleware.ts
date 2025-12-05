@@ -19,9 +19,8 @@ export default function auth(
     const verified = verifyToken(token as string);
     if (verified) {
       const decoded = decodeToken(token as string);
-      console.log(decodeToken);
+      req.user = decoded as jwt.JwtPayload;
+      next();
     }
-    // console.log(decodeToken(token as string));
   }
-  next();
 }
