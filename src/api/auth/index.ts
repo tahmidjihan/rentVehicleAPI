@@ -1,5 +1,6 @@
 import express from 'express';
 import { signin, signup } from './auth.controller';
+import type { Credentials } from './User';
 
 const router = express.Router();
 
@@ -11,8 +12,14 @@ router.post('/signup', async (req: express.Request, res: express.Response) => {
   res.send(signup(user));
 });
 router.post('/signin', async (req: express.Request, res: express.Response) => {
-  const credentials = await req.body.credentials;
+  const credentials: Credentials = await req.body.credentials;
   // console.log(req.body);
-  res.send(signin(credentials));
+  // res.send(signin(credentials));
+  const result = await signin(credentials);
+  if (result) {
+    res.send(result);
+  } else {
+    res.status(401).send('Access denied');
+  }
 });
 export default router;

@@ -1,6 +1,8 @@
 import { dbPool } from '../../dbPool';
-import { type User } from './User.d';
+import { type Credentials, type User, type UserResponse } from './User.d';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import config from '../../config';
 
 // hashing
 
@@ -53,13 +55,10 @@ export async function signup(user: User) {
   //   console.log(data);
   return data;
 }
-export async function signin({
-  email,
-  password,
-}: {
-  email: string;
-  password: string;
-}) {
+function signJWT(user: UserResponse) {
+  return jwt.sign(user, config.JWT_SECRET);
+}
+export async function signin({ email, password }: Credentials) {
   const data = await dbPool.query('SELECT * FROM users WHERE email = $1', [
     email,
   ]);
@@ -67,10 +66,22 @@ export async function signin({
   if (user) {
     const hashedPassword = user.password;
     const result = await comparePassword(hashedPassword, password);
-    // if (result) {
-    //   return user;
-    // }
-    console.log(result);
+    if (result) {
+      const userToSend: UserResponse = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+      };
+      const token = signJWT(userToSend);
+      // userToSend.token = token;
+      const result = { user: { ...userToSend }, token: token };
+      return result;
+    } else {
+      return null;
+    }
+    // console.log(result);
   }
   // return null;
 }
