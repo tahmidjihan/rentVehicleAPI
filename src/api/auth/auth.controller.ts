@@ -24,28 +24,34 @@ async function hashPassword(password: string) {
   }
   return hashedPassword;
 }
-function comparePassword(hashedPassword: string, password: string) {
-  return bcrypt.compare(password, hashedPassword, function (err, result) {
+async function comparePassword(hashedPassword: string, password: string) {
+  let pending = true;
+  let resultToReturn = false;
+  bcrypt.compare(password, hashedPassword, function (err, result) {
     if (err) {
       console.log(err);
     }
+    resultToReturn = result;
+    pending = false;
+    // console.log(result);
     return result;
   });
+  while (pending) {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  return resultToReturn;
 }
 
 //auth
 export async function signup(user: User) {
   const password = user.password;
-  //   console.log(password);
   const hashedPassword = await hashPassword(password);
-  //   console.log(hashedPassword);
   const data = await dbPool.query(
     'INSERT INTO users (name, email, password, phone, role) VALUES ($1, $2, $3, $4, $5) RETURNING *',
     [user.name, user.email, hashedPassword, user.phone, user.role]
   );
-  console.log(data);
+  //   console.log(data);
   return data;
-  //   return user;
 }
 export async function signin({
   email,
@@ -54,7 +60,17 @@ export async function signin({
   email: string;
   password: string;
 }) {
-  console.log('login: ');
-  console.log(email, password);
-  return { email, password };
+  const data = await dbPool.query('SELECT * FROM users WHERE email = $1', [
+    email,
+  ]);
+  const user = data.rows[0];
+  if (user) {
+    const hashedPassword = user.password;
+    const result = await comparePassword(hashedPassword, password);
+    // if (result) {
+    //   return user;
+    // }
+    console.log(result);
+  }
+  // return null;
 }
