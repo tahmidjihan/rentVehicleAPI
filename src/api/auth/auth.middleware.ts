@@ -23,6 +23,10 @@ export default function auth(
       req.user = decoded as jwt.JwtPayload;
       console.log('check after setting req.user');
       next();
+    } else {
+      res.status(401).send('Access denied');
     }
+  } else {
+    res.status(401).send('Access denied');
   }
 }
