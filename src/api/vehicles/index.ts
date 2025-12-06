@@ -4,6 +4,7 @@ import {
   getVehicle,
   getVehicles,
   postVehicle,
+  putVehicle,
 } from './controllers/vehicles.controller';
 
 const router = express.Router();
@@ -32,4 +33,5 @@ router.post('/', auth, async (req, res) => {
   const result = await postVehicle(data);
   res.send(result);
 });
+router.put('/:id', auth, putVehicle);
 export default router;
