@@ -3,7 +3,7 @@ import {
   type Credentials,
   type User,
   type UserResponse,
-} from '../../types/User';
+} from '../../types/User.d';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import config from '../../config';

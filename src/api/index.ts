@@ -1,6 +1,8 @@
 import express from 'express';
 import auth from './auth';
 import vehicles from './vehicles';
+import users from './users';
+import authorize from './auth/auth.middleware';
 const router = express.Router();
 
 router.get('/', (req, res) => {
@@ -8,5 +10,5 @@ router.get('/', (req, res) => {
 });
 router.use('/auth', auth);
 router.use('/vehicles', vehicles);
-
+router.use('/users', authorize, users);
 export default router;
