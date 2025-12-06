@@ -15,7 +15,7 @@ function initDB() {
         id SERIAL PRIMARY KEY,
         vehicle_name VARCHAR(255) NOT NULL,
         type VARCHAR(255) NOT NULL,
-        registration_number VARCHAR(255) NOT NULL,
+        registration_number VARCHAR(255) NOT NULL UNIQUE,
         daily_rent_price INT NOT NULL CHECK(daily_rent_price > 0),
         availability_status VARCHAR(255) NOT NULL
       );

@@ -1,6 +1,7 @@
 import express from 'express';
 import { dbPool } from '../../../dbPool';
 import type { UserResponse } from '../../../types/User';
+import type { Vehicle } from '../../../types/vehicle';
 
 export async function getBookings(req: express.Request) {
   const user = req?.user as UserResponse;
@@ -8,4 +9,55 @@ export async function getBookings(req: express.Request) {
   return await dbPool.query('SELECT * FROM bookings WHERE user_id = $1', [
     userId,
   ]);
+}
+
+export async function addBooking(req: express.Request) {
+  const { customer_id, vehicle_id, rent_start_date, rent_end_date } = req.body;
+
+  const vehicleData = await dbPool.query(
+    'SELECT * FROM vehicles WHERE id = $1',
+    [vehicle_id]
+  );
+  //   console.log(vehicleData);
+  const vehicle = vehicleData.rows[0] as Vehicle;
+  //   console.log(vehicle);
+  if (vehicle.availability_status === 'booked') {
+    return 'Vehicle is already booked';
+  }
+  const times = {
+    start: new Date(rent_start_date).getTime() / 1000 / 60 ** 2 / 24,
+    end: new Date(rent_end_date).getTime() / 1000 / 60 ** 2 / 24,
+  };
+
+  const totalTime = times.end - times.start;
+
+  const vehiclePrice = vehicle.daily_rent_price;
+  const totalPrice = totalTime * vehiclePrice;
+
+  //   console.log(totalTime);
+  //   console.log(req.body);
+  const wholeData = {
+    customer_id,
+    vehicle_id,
+    start_date: new Date(rent_start_date).toISOString(),
+    end_date: new Date(rent_end_date).toISOString(),
+    total_price: totalPrice,
+    status: 'booked',
+  };
+  const data = await dbPool.query(
+    'INSERT INTO bookings (customer_id, vehicle_id, rent_start_date, rent_end_date, total_price, status) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+    [
+      wholeData.customer_id,
+      wholeData.vehicle_id,
+      wholeData.start_date,
+      wholeData.end_date,
+      wholeData.total_price,
+      wholeData.status,
+    ]
+  );
+  if (data) {
+    return data.rows[0];
+  }
+
+  return 'ok';
 }
