@@ -18,9 +18,7 @@ export async function addBooking(req: express.Request) {
     'SELECT * FROM vehicles WHERE id = $1',
     [vehicle_id]
   );
-  //   console.log(vehicleData);
   const vehicle = vehicleData.rows[0] as Vehicle;
-  //   console.log(vehicle);
   if (vehicle.availability_status === 'booked') {
     return 'Vehicle is already booked';
   }
@@ -34,8 +32,6 @@ export async function addBooking(req: express.Request) {
   const vehiclePrice = vehicle.daily_rent_price;
   const totalPrice = totalTime * vehiclePrice;
 
-  //   console.log(totalTime);
-  //   console.log(req.body);
   const wholeData = {
     customer_id,
     vehicle_id,
@@ -60,4 +56,37 @@ export async function addBooking(req: express.Request) {
   }
 
   return 'ok';
+}
+export async function putBooking(req: express.Request) {
+  const { id, status } = req.body;
+
+  // const cancelled = 'cancelled';
+  try {
+    const dataUpdate = await dbPool.query(
+      'UPDATE bookings SET status = $1 WHERE id = $2 RETURNING *',
+      [status, id]
+    );
+    const updateVehicle = await dbPool.query(
+      'UPDATE vehicles SET availability_status = $1 WHERE id = $2 RETURNING *',
+      ['returned', id]
+    );
+    // return data.rows[0];
+    if (dataUpdate) {
+      // return dataUpdate.rows[0];
+      const data = await dbPool.query('SELECT * FROM bookings WHERE id = $1', [
+        id,
+      ]);
+      // ? have to make more changes according documentation
+      // TODO I have to remove few things from the response
+      const result = {
+        success: true,
+        message: 'Booking cancelled successfully',
+        data: { ...data.rows[0], status: 'cancelled' },
+      };
+      return result;
+    }
+  } catch (err) {
+    console.log(err);
+    return 'error';
+  }
 }
