@@ -1,5 +1,9 @@
 import { dbPool } from '../../dbPool';
-import { type Credentials, type User, type UserResponse } from './User.d';
+import {
+  type Credentials,
+  type User,
+  type UserResponse,
+} from '../../types/User';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import config from '../../config';

@@ -1,6 +1,6 @@
 import express from 'express';
 import { signin, signup } from './auth.controller';
-import type { Credentials } from './User';
+import type { Credentials } from '../../types/User';
 
 const router = express.Router();
 
