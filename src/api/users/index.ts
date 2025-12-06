@@ -1,5 +1,9 @@
 import express from 'express';
-import { getAllUsers, updateUserByAdmin } from './controllers/admin.controller';
+import {
+  deleteUser,
+  getAllUsers,
+  updateUserByAdmin,
+} from './controllers/admin.controller';
 import type { UserResponse } from '../../types/User';
 import { updateUser } from './controllers/user.controller';
 
@@ -14,7 +18,7 @@ router.get('/', async (req, res) => {
   res.send(await getAllUsers());
 });
 
-router.put('/', async (req: express.Request, res: express.Response) => {
+router.put('/:userId', async (req: express.Request, res: express.Response) => {
   if (req.body) {
     const user = req?.user as UserResponse;
     // console.log(user);
@@ -28,3 +32,4 @@ router.put('/', async (req: express.Request, res: express.Response) => {
   res.status(400).send('No data received');
 });
 export default router;
+router.delete('/:userId', deleteUser);

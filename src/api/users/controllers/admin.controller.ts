@@ -19,7 +19,28 @@ export async function updateUserByAdmin(req: express.Request) {
     return { status: 'success' };
   }
 }
-// export async function deleteUser(id: number) {
-//   const data = await dbPool.query('DELETE FROM users WHERE id = $1', [id]);
-//   return data.rows;
-// }
+export async function deleteUser(req: express.Request, res: express.Response) {
+  const user = req?.user as UserResponse;
+  if (user?.role !== 'admin') {
+    res.status(401).send('Access denied');
+  }
+
+  const userId = req.params.userId;
+
+  const bookingData = await dbPool.query(
+    'SELECT * FROM bookings WHERE customer_id = $1',
+    [userId]
+  );
+  if (bookingData.rows.length > 0) {
+    // return { status: 'error', message: 'User has active bookings' };
+    bookingData.rows.forEach((booking) => {
+      if (booking.status === 'booked') {
+        res.status(400).send('User has active bookings');
+        return;
+      }
+    });
+  }
+
+  const data = await dbPool.query('DELETE FROM users WHERE id = $1', [userId]);
+  res.send({ status: 'success', message: 'User deleted successfully' });
+}

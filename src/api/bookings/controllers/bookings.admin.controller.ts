@@ -12,7 +12,7 @@ export async function getBookingsByAdmin() {
 }
 export async function putBookingByAdmin(req: express.Request) {
   const { status } = req.body;
-  const id = req.params.id;
+  const id = req.params.bookingId;
 
   if (status === 'returned') {
     try {
