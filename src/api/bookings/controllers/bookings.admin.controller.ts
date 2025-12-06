@@ -1,12 +1,19 @@
 import express from 'express';
 import { dbPool } from '../../../dbPool';
+import type { UserResponse } from '../../../types/User';
 
 export async function getBookingsByAdmin() {
   const data = await dbPool.query('SELECT * FROM bookings');
-  return data.rows;
+  return {
+    status: 'success',
+    message: 'Bookings fetched successfully',
+    data: data.rows,
+  };
 }
 export async function putBookingByAdmin(req: express.Request) {
-  const { id, status } = req.body;
+  const { status } = req.body;
+  const id = req.params.id;
+
   if (status === 'returned') {
     try {
       const dataUpdated = await dbPool.query(
@@ -27,8 +34,8 @@ export async function putBookingByAdmin(req: express.Request) {
           // TODO I have to remove few things from the response
           const result = {
             success: true,
-            message: 'Booking cancelled successfully',
-            data: { ...data.rows[0], status: 'cancelled' },
+            message: 'Booking returned successfully',
+            data: { ...data.rows[0], status: 'returned' },
           };
           return result;
         }

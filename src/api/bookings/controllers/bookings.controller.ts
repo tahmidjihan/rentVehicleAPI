@@ -6,9 +6,15 @@ import type { Vehicle } from '../../../types/vehicle';
 export async function getBookings(req: express.Request) {
   const user = req?.user as UserResponse;
   const userId = user?.id;
-  return await dbPool.query('SELECT * FROM bookings WHERE user_id = $1', [
-    userId,
-  ]);
+  const data = await dbPool.query(
+    'SELECT * FROM bookings WHERE customer_id = $1',
+    [userId]
+  );
+  return {
+    status: 'success',
+    message: 'Bookings fetched successfully',
+    data: data.rows,
+  };
 }
 
 export async function addBooking(req: express.Request) {
@@ -58,35 +64,47 @@ export async function addBooking(req: express.Request) {
   return 'ok';
 }
 export async function putBooking(req: express.Request) {
-  const { id, status } = req.body;
-
-  // const cancelled = 'cancelled';
-  try {
-    const dataUpdate = await dbPool.query(
-      'UPDATE bookings SET status = $1 WHERE id = $2 RETURNING *',
-      [status, id]
-    );
-    const updateVehicle = await dbPool.query(
-      'UPDATE vehicles SET availability_status = $1 WHERE id = $2 RETURNING *',
-      ['returned', id]
-    );
-    // return data.rows[0];
-    if (dataUpdate) {
-      // return dataUpdate.rows[0];
+  const { status } = req.body;
+  const id = req.params.id;
+  const user = req?.user as UserResponse;
+  if (status == 'cancelled') {
+    console.log('passsed 1st layer');
+    try {
       const data = await dbPool.query('SELECT * FROM bookings WHERE id = $1', [
         id,
       ]);
-      // ? have to make more changes according documentation
-      // TODO I have to remove few things from the response
-      const result = {
-        success: true,
-        message: 'Booking cancelled successfully',
-        data: { ...data.rows[0], status: 'cancelled' },
-      };
-      return result;
+      if (data.rows[0].customer_id !== user.id) {
+        console.log('forbade');
+        return 'Forbidden';
+      }
+      console.log(data.rows[0].customer_id);
+      console.log(user.id + 'is the real one');
+      console.log('granted');
+      const dataUpdate = await dbPool.query(
+        'UPDATE bookings SET status = $1 WHERE id = $2 RETURNING *',
+        [status, id]
+      );
+      const updateVehicle = await dbPool.query(
+        'UPDATE vehicles SET availability_status = $1 WHERE id = $2 RETURNING *',
+        ['returned', id]
+      );
+      if (dataUpdate && updateVehicle) {
+        const data = await dbPool.query(
+          'SELECT * FROM bookings WHERE id = $1',
+          [id]
+        );
+        // ? have to make more changes according documentation
+        // TODO I have to remove few things from the response
+        const result = {
+          success: true,
+          message: 'Booking cancelled successfully now',
+          data: { ...data.rows[0], status: 'cancelled' },
+        };
+        return result;
+      }
+    } catch (err) {
+      console.log(err);
+      return 'error';
     }
-  } catch (err) {
-    console.log(err);
-    return 'error';
   }
 }

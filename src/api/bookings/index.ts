@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   res.send(await addBooking(req));
 });
-router.put('/', async (req, res) => {
+router.put('/:id', async (req, res) => {
   // res.send(await addBooking(req));
   const user = req?.user as UserResponse;
   if (user?.role !== 'admin') {
