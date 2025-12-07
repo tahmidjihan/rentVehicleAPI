@@ -64,22 +64,14 @@ export async function deleteVehicle(
   req: express.Request,
   res: express.Response
 ) {
-  // const data = await dbPool.query('DELETE FROM vehicles WHERE id = $1', [id]);
-  // return data.rows[0];
   const id = Number(req.params.id) as number;
-  const bookings = await dbPool.query(
-    'SELECT * FROM bookings WHERE vehicle_id = $1',
-    [id]
-  );
-  if (bookings.rows.length > 0) {
-    // res.status(401).send('Vehicle is in use');
-    bookings.rows.forEach((booking) => {
-      if (booking.status === 'booked') {
-        res.status(401).send('Vehicle is in use');
-      }
-    });
+  const isBooked = await services.checkVehicleBooking(id);
+  if (isBooked) {
+    return res
+      .status(400)
+      .send({ status: 'error', message: 'Vehicle is currently booked' });
   }
-  const data = await dbPool.query('DELETE FROM vehicles WHERE id = $1', [id]);
+  const data = await services.deleteVehicle(id);
   res.send({
     status: 'success',
     message: 'Vehicle deleted successfully',

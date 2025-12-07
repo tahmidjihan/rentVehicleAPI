@@ -43,9 +43,24 @@ async function putVehicle(id: number, vehicle: Vehicle) {
   );
   return data;
 }
+async function deleteVehicle(id: number) {
+  const data = await dbPool.query('DELETE FROM vehicles WHERE id = $1', [id]);
+  return data;
+}
+async function checkVehicleBooking(id: number) {
+  const bookings = await dbPool.query('SELECT * FROM vehicles WHERE id = $1', [
+    id,
+  ]);
+  if (bookings.rows[0].status === 'booked') {
+    return true;
+  }
+  return false;
+}
 export default {
   getVehicles,
   getVehicle,
   postVehicle,
   putVehicle,
+  deleteVehicle,
+  checkVehicleBooking,
 };

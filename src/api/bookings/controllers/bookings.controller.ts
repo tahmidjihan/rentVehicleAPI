@@ -2,42 +2,49 @@ import express from 'express';
 import { dbPool } from '../../../dbPool';
 import type { UserResponse } from '../../../types/User';
 import type { Vehicle } from '../../../types/vehicle';
+import services from '../services/bookings.service';
 
-export async function getBookings(req: express.Request) {
+// bookings GET
+async function getBookings(req: express.Request, res: express.Response) {
   const user = req?.user as UserResponse;
-  const userId = user?.id;
-  const data = await dbPool.query(
-    'SELECT * FROM bookings WHERE customer_id = $1',
-    [userId]
-  );
-  return {
-    status: 'success',
+  if (user?.role !== 'admin') {
+    const userId = user?.id;
+    const data = await services.getBookings(userId);
+    const result = {
+      success: true,
+      message: 'Bookings fetched successfully',
+      data: data.rows,
+    };
+    res.send(result);
+  }
+  // ? here admin logic should go
+  // const data = await services.getBookings();
+  const result = {
+    success: true,
     message: 'Bookings fetched successfully',
-    data: data.rows,
+    // data: data.rows,
   };
+  res.send(result);
 }
 
-export async function addBooking(req: express.Request) {
+async function addBooking(req: express.Request, res: express.Response) {
   const { customer_id, vehicle_id, rent_start_date, rent_end_date } = req.body;
 
-  const vehicleData = await dbPool.query(
-    'SELECT * FROM vehicles WHERE id = $1',
-    [vehicle_id]
-  );
-  const vehicle = vehicleData.rows[0] as Vehicle;
-  if (vehicle.availability_status === 'booked') {
-    return 'Vehicle is already booked';
+  const vehicle = await services.isBooked(vehicle_id);
+  if (vehicle.success === false) {
+    res.send({
+      success: false,
+      message: 'Error : Vehicle is currently booked',
+      error: vehicle.message,
+    });
   }
   const times = {
     start: new Date(rent_start_date).getTime() / 1000 / 60 ** 2 / 24,
     end: new Date(rent_end_date).getTime() / 1000 / 60 ** 2 / 24,
   };
-
-  const totalTime = times.end - times.start;
-
-  const vehiclePrice = vehicle.daily_rent_price;
-  const totalPrice = totalTime * vehiclePrice;
-
+  const daily_rent_price = await vehicle.data.daily_rent_price;
+  const totalPrice = (times.end - times.start) * Number(daily_rent_price);
+  // console.log(vehicle);
   const wholeData = {
     customer_id,
     vehicle_id,
@@ -46,29 +53,24 @@ export async function addBooking(req: express.Request) {
     total_price: totalPrice,
     status: 'booked',
   };
-  const data = await dbPool.query(
-    'INSERT INTO bookings (customer_id, vehicle_id, rent_start_date, rent_end_date, total_price, status) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-    [
-      wholeData.customer_id,
-      wholeData.vehicle_id,
-      wholeData.start_date,
-      wholeData.end_date,
-      wholeData.total_price,
-      wholeData.status,
-    ]
-  );
+  // console.log(wholeData);
+  const data = await services.addBooking(wholeData);
+  // const data = { totalPrice };
   if (data) {
-    return data.rows[0];
+    res.send({
+      success: true,
+      message: 'Booking added successfully',
+      // data: data.rows[0],
+    });
+    return;
   }
-
-  return 'ok';
 }
-export async function putBooking(req: express.Request) {
+async function putBooking(req: express.Request) {
   const { status } = req.body;
   const id = req.params.id;
   const user = req?.user as UserResponse;
   if (status == 'cancelled') {
-    console.log('passsed 1st layer');
+    // console.log('passed 1st layer');
     try {
       const data = await dbPool.query('SELECT * FROM bookings WHERE id = $1', [
         id,
@@ -108,3 +110,4 @@ export async function putBooking(req: express.Request) {
     }
   }
 }
+export default { getBookings, addBooking, putBooking };
