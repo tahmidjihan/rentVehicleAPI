@@ -63,9 +63,9 @@ async function putVehicle(req: express.Request, res: express.Response) {
   try {
     const data = await services.putVehicle(id, vehicle);
     res.send({
-      status: 'success',
+      success: true,
       message: 'Vehicle updated successfully',
-      data: data,
+      data: data.rows[0],
     });
   } catch (error) {
     console.log(error);

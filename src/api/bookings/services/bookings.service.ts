@@ -14,8 +14,6 @@ async function isBooked(vehicleId: number) {
   //   return data;
   if (data.rows[0].status === 'booked') {
     return {
-      success: false,
-      message: 'Vehicle is currently booked',
       error: ' Vehicle is currently booked',
     };
   }
@@ -42,19 +40,21 @@ async function addBooking(data: any) {
       'UPDATE vehicles SET availability_status = $1 WHERE id = $2 RETURNING *',
       ['booked', data.vehicle_id]
     );
+    const vehicleData = await dbPool.query(
+      'SELECT * FROM vehicles WHERE id = $1',
+      [data.vehicle_id]
+    );
+
     const response = {
-      success: true,
-      message: 'Booking added successfully',
-      data: {
-        ...result.rows[0],
-        vehicle: updateVehicle.rows[0],
+      ...result.rows[0],
+      vehicle: {
+        vehicle_name: vehicleData.rows[0].vehicle_name,
+        daily_rent_price: vehicleData.rows[0].daily_rent_price,
       },
     };
     return response;
   }
   return {
-    success: false,
-    message: 'Error adding booking',
     error: 'Error adding booking',
   };
   // return result;

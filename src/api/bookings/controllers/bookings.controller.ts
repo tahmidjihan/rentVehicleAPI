@@ -20,7 +20,14 @@ async function getBookings(req: express.Request, res: express.Response) {
   // ? here admin logic should go
   // const data = await services.getBookings();
 
-  res.send(await adminServices.getBookings());
+  const data = await adminServices.getBookings();
+
+  const result = {
+    success: true,
+    message: 'Bookings fetched successfully',
+    data: data,
+  };
+  res.send(result);
 }
 
 async function addBooking(req: express.Request, res: express.Response) {
@@ -52,11 +59,18 @@ async function addBooking(req: express.Request, res: express.Response) {
   // console.log(wholeData);
   const data = await services.addBooking(wholeData);
   // const data = { totalPrice };
-  if (data) {
-    res.send({
+  if (!data.err) {
+    res.status(201).send({
       success: true,
-      message: 'Booking added successfully',
-      // data: data.rows[0],
+      message: 'Booking created successfully',
+      data: data,
+    });
+    return;
+  } else if (data.err) {
+    res.send({
+      success: false,
+      message: 'Error',
+      error: data.err,
     });
     return;
   }
