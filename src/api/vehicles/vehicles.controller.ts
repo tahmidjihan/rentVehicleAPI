@@ -59,13 +59,13 @@ async function putVehicle(req: express.Request, res: express.Response) {
     res.status(401).send('Access denied');
   }
   const id = Number(req.params.vehicleId) as number;
-  const vehicle: Vehicle = req.body;
+  const vehicle = req.body;
   try {
     const data = await services.putVehicle(id, vehicle);
     res.send({
       status: 'success',
       message: 'Vehicle updated successfully',
-      data: data.rows[0],
+      data: data,
     });
   } catch (error) {
     console.log(error);

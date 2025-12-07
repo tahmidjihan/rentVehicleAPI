@@ -29,18 +29,24 @@ async function postVehicle(data: Vehicle) {
   return result;
 }
 // vehicle PUT
-async function putVehicle(id: number, vehicle: Vehicle) {
+async function putVehicle(id: number, vehicle: any) {
+  const fields = [];
+  const values = [];
+  for (const key in vehicle) {
+    if (key === 'id') {
+      delete vehicle[key];
+      continue;
+    }
+    fields.push(`${key} = $${fields.length + 1}`);
+    values.push(vehicle[key]);
+  }
+  const query = fields.join(', ');
   const data = await dbPool.query(
-    'UPDATE vehicles SET vehicle_name = $1, type = $2, registration_number = $3, daily_rent_price = $4, availability_status = $5 WHERE id = $6 RETURNING *',
-    [
-      vehicle.vehicle_name,
-      vehicle.type,
-      vehicle.registration_number,
-      vehicle.daily_rent_price,
-      vehicle.availability_status,
-      id,
-    ]
+    `UPDATE vehicles SET ${query} WHERE id = $6 RETURNING *`,
+    [...values, id]
   );
+
+  // console.log(data);
   return data;
 }
 async function deleteVehicle(id: number) {
