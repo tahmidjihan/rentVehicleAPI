@@ -84,10 +84,10 @@ export async function deleteVehicle(
       .send({ status: 'error', message: 'Vehicle is currently booked' });
   }
   const data = await services.deleteVehicle(id);
+
   res.send({
-    status: 'success',
+    success: true,
     message: 'Vehicle deleted successfully',
-    data: data.rows[0],
   });
 }
 export default {

@@ -9,7 +9,13 @@ async function getUsers(req: express.Request, res: express.Response) {
   if (user?.role !== 'admin') {
     res.status(401).send('Access denied');
   }
-  res.send(await adminService.getAllUsers());
+  // res.send(await adminService.getAllUsers());
+  const data = await adminService.getAllUsers();
+  res.send({
+    success: true,
+    message: 'Users retrieved successfully',
+    data: data,
+  });
 }
 
 // PUT user
@@ -20,7 +26,14 @@ async function updateUser(req: express.Request, res: express.Response) {
     res.send(await services.updateUser(req));
   }
   // res.send(await services.updateUser(req));
-  res.send(await adminService.updateUser(user));
+  // res.send(await adminService.updateUser(user));
+  const id = req.params.userId;
+  const data = await adminService.updateUser(user, Number(id));
+  res.send({
+    success: true,
+    message: 'User updated successfully',
+    data: data,
+  });
 }
 
 // DELETE user

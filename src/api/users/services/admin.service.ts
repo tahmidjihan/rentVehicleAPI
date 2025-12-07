@@ -6,14 +6,25 @@ export async function getAllUsers() {
   const data = await dbPool.query('SELECT * FROM users');
   return data.rows;
 }
-export async function updateUser(user: any) {
+export async function updateUser(user: any, id: number) {
   // const user = req?.user as UserResponse;
-  const { id, name, email, phone, role } = user;
+  // const { id, name, email, phone, role } = user;
+  const fields = [];
+  const values = [];
+  for (const key in user) {
+    if (key === 'id') {
+      delete user[key];
+      continue;
+    }
+    fields.push(`${key} = $${fields.length + 1}`);
+    values.push(user[key]);
+  }
+  const query = fields.join(', ');
 
-  const data = await dbPool.query(
-    'UPDATE users SET name = $1, email = $2, phone = $3, role = $4 WHERE id = $5',
-    [name, email, phone, role, id]
-  );
+  const data = await dbPool.query(`UPDATE users SET ${query} WHERE id = $5`, [
+    ...values,
+    id,
+  ]);
   // console.log(data);
   if (data) {
     return { success: true, message: 'User updated successfully' };
