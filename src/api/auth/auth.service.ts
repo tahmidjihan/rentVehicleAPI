@@ -56,8 +56,23 @@ async function signup(user: User) {
     'INSERT INTO users (name, email, password, phone, role) VALUES ($1, $2, $3, $4, $5) RETURNING *',
     [user.name, user.email, hashedPassword, user.phone, user.role]
   );
+  if (data) {
+    const result = await dbPool.query('SELECT * FROM users WHERE email = $1', [
+      user.email,
+    ]);
+    const response: UserResponse = {
+      id: result.rows[0].id,
+      name: result.rows[0].name,
+      email: result.rows[0].email,
+      phone: result.rows[0].phone,
+      role: result.rows[0].role,
+    };
+
+    // userToSend.token = token;
+    return response;
+  }
   //   console.log(data);
-  return data;
+  // return data;
 }
 function signJWT(user: UserResponse) {
   return jwt.sign(user, config.JWT_SECRET);
@@ -80,7 +95,7 @@ async function signin({ email, password }: Credentials) {
       };
       const token = signJWT(userToSend);
       // userToSend.token = token;
-      const result = { user: { ...userToSend }, token: token };
+      const result = { token: token, user: { ...userToSend } };
       return result;
     } else {
       return null;

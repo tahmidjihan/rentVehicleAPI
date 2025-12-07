@@ -1,5 +1,5 @@
 import express from 'express';
-
+import auth from '../auth/auth.middleware.js';
 // import {
 //   getBookingsByAdmin,
 //   putBookingByAdmin,
@@ -10,7 +10,7 @@ const router = express.Router();
 // router.use('/', (req, res) => {
 //   res.send('this is bookings route');
 // });
-router.get('/', controller.getBookings);
-router.post('/', controller.addBooking);
-router.put('/:bookingId', controller.putBooking);
+router.get('/', auth, controller.getBookings);
+router.post('/', auth, controller.addBooking);
+router.put('/:bookingId', auth, controller.putBooking);
 export default router;

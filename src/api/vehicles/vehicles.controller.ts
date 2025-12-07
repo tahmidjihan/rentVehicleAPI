@@ -5,9 +5,17 @@ import services from './vehicles.service.js';
 // vehicles GET
 async function getVehicles(req: express.Request, res: express.Response) {
   const data = await services.getVehicles();
+  if (data.rows.length === 0) {
+    res.send({
+      success: true,
+      message: 'No vehicles found',
+      data: [],
+    });
+    return;
+  }
   const result = {
-    status: 'success',
-    message: 'Vehicles fetched successfully',
+    success: true,
+    message: 'Vehicles retrieved successfully',
     data: data.rows,
   };
 
@@ -15,11 +23,11 @@ async function getVehicles(req: express.Request, res: express.Response) {
 }
 // vehicle GET
 async function getVehicle(req: express.Request, res: express.Response) {
-  const id = Number(req.params.id) as number;
+  const id = Number(req.params.vehicleId) as number;
   const data = await services.getVehicle(id);
   const result = {
     status: 'success',
-    message: 'Vehicle fetched successfully',
+    message: 'Vehicle retrieved successfully',
     data: data.rows[0],
   };
   res.send(result);
@@ -30,15 +38,15 @@ async function postVehicle(req: express.Request, res: express.Response) {
   if (user?.role !== 'admin') {
     res.status(401).send('Access denied');
   }
-  const vehicle = req.body.vehicle;
+  const vehicle = req.body;
   try {
     const data = await services.postVehicle(vehicle);
     const result = {
-      status: 'success',
-      message: 'Vehicle added successfully',
+      success: true,
+      message: 'Vehicle created successfully',
       data: data.rows[0],
     };
-    res.send(result);
+    res.status(201).send(result);
   } catch (err) {
     console.log(err);
   }
@@ -50,20 +58,25 @@ async function putVehicle(req: express.Request, res: express.Response) {
   if (user?.role !== 'admin') {
     res.status(401).send('Access denied');
   }
-  const id = Number(req.params.id) as number;
+  const id = Number(req.params.vehicleId) as number;
   const vehicle: Vehicle = req.body;
-  const data = await services.putVehicle(id, vehicle);
-  res.send({
-    status: 'success',
-    message: 'Vehicle updated successfully',
-    data: data.rows[0],
-  });
+  try {
+    const data = await services.putVehicle(id, vehicle);
+    res.send({
+      status: 'success',
+      message: 'Vehicle updated successfully',
+      data: data.rows[0],
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Internal server error');
+  }
 }
 export async function deleteVehicle(
   req: express.Request,
   res: express.Response
 ) {
-  const id = Number(req.params.id) as number;
+  const id = Number(req.params.vehicleId) as number;
   const isBooked = await services.checkVehicleBooking(id);
   if (isBooked) {
     return res

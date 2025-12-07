@@ -3,7 +3,7 @@ import auth from './auth/index.js';
 import vehicles from './vehicles/index.js';
 import users from './users/index.js';
 import bookings from './bookings/index.js';
-import authorize from './auth/auth.middleware.js';
+// import authorize from './auth/auth.middleware.js';
 const router = express.Router();
 
 router.get('/', (req, res) => {
@@ -11,6 +11,6 @@ router.get('/', (req, res) => {
 });
 router.use('/auth', auth);
 router.use('/vehicles', vehicles);
-router.use('/users', authorize, users);
-router.use('/bookings', authorize, bookings);
+router.use('/users', users);
+router.use('/bookings', bookings);
 export default router;

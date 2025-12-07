@@ -35,9 +35,10 @@ export async function deleteUser(req: express.Request, res: express.Response) {
   const data = await adminService.deleteUser(Number(userId));
   // res.send(data);
   const result = {
-    status: 'success',
+    success: true,
     message: 'User deleted successfully',
   };
+  res.send(result);
 }
 
 export default { getUsers, updateUser, deleteUser };
