@@ -21,14 +21,22 @@ async function getUsers(req: express.Request, res: express.Response) {
 // PUT user
 async function updateUser(req: express.Request, res: express.Response) {
   const user = req.user;
+  const id = req.params.userId;
+  const body = req.body;
+
+  // const { id, name, email, phone, role } = newUser;
   if (user?.role !== 'admin') {
+    if (user?.email !== body.email && user) {
+      //  return 'Forbidden';
+      res.status(401).send('Access denied');
+    }
     // res.status(401).send('Access denied');
-    res.send(await services.updateUser(req));
+    res.send(await services.updateUser(body, Number(id)));
   }
   // res.send(await services.updateUser(req));
   // res.send(await adminService.updateUser(user));
-  const id = req.params.userId;
-  const data = await adminService.updateUser(user, Number(id));
+
+  const data = await services.updateUser(body, Number(id));
   res.send({
     success: true,
     message: 'User updated successfully',

@@ -26,7 +26,7 @@ async function getVehicle(req: express.Request, res: express.Response) {
   const id = Number(req.params.vehicleId) as number;
   const data = await services.getVehicle(id);
   const result = {
-    status: 'success',
+    success: true,
     message: 'Vehicle retrieved successfully',
     data: data.rows[0],
   };

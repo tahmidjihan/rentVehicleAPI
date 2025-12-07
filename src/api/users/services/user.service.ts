@@ -1,20 +1,26 @@
 import { dbPool } from '../../../dbPool.js';
-import express from 'express';
-import type { UserResponse } from '../../../types/User.js';
 
-export async function updateUser(req: express.Request) {
-  const user = req?.user as UserResponse;
-  const newUser = req.body.user;
-  if (user.email !== newUser.email && user) {
-    return 'Forbidden';
+export async function updateUser(user: any, id: number) {
+  const fields = [];
+  const values = [];
+  for (const key in user) {
+    if (key === 'id') {
+      delete user[key];
+      continue;
+    }
+    fields.push(`${key} = $${fields.length + 1}`);
+    values.push(user[key]);
   }
-  const { id, name, email, phone, role } = newUser;
+  const query = fields.join(', ');
+  console.log(query);
   const data = await dbPool.query(
-    'UPDATE users SET name = $1, email = $2, phone = $3, role = $4 WHERE id = $5',
-    [name, email, phone, role, id]
+    `UPDATE users SET ${query} WHERE id = $${values.length + 1} RETURNING *`,
+    [...values, id]
   );
   if (data) {
-    return { status: 'success' };
+    // return { status: 'success' };
+    const data = await dbPool.query('SELECT * FROM users WHERE id = $1', [id]);
+    return data.rows[0];
   }
 }
 export default { updateUser };

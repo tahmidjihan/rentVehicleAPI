@@ -42,7 +42,7 @@ async function putVehicle(id: number, vehicle: any) {
   }
   const query = fields.join(', ');
   const data = await dbPool.query(
-    `UPDATE vehicles SET ${query} WHERE id = $6 RETURNING *`,
+    `UPDATE vehicles SET ${query} WHERE id = $${values.length + 1} RETURNING *`,
     [...values, id]
   );
 
