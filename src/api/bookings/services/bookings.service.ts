@@ -2,7 +2,13 @@ import { dbPool } from '../../../dbPool.js';
 
 async function getBookings(userId: number) {
   const data = await dbPool.query(
-    `SELECT b.* 
+    `SELECT 
+      b.id,
+      b.vehicle_id,
+      b.rent_start_date,
+      b.rent_end_date,
+      b.total_price,
+      b.status,
     json_build_object(
      'vehicle_name' , v.vehicle_name,
      'registration_number' , v.registration_number,
