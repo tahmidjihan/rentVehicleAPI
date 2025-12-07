@@ -1,5 +1,5 @@
-import { dbPool } from '../../dbPool';
-import type { Vehicle } from '../../types/vehicle';
+import { dbPool } from '../../dbPool.js';
+import type { Vehicle } from '../../types/vehicle.js';
 
 // all vehicles GET
 async function getVehicles() {

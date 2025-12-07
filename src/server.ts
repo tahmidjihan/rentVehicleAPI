@@ -1,8 +1,8 @@
 import express from 'express';
 // import dotenv from 'dotenv';
-import api from './api';
-import envData from './config';
-import initDB from './initDB';
+import api from './api/index.js';
+import envData from './config.js';
+import initDB from './initDB.js';
 // dotenv.config();
 
 const app = express();

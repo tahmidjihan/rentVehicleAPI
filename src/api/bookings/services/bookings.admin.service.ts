@@ -1,6 +1,5 @@
 import express from 'express';
-import { dbPool } from '../../../dbPool';
-import type { UserResponse } from '../../../types/User';
+import { dbPool } from '../../../dbPool.js';
 
 async function getBookings() {
   const data = await dbPool.query('SELECT * FROM bookings');

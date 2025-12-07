@@ -1,12 +1,12 @@
-import { dbPool } from '../../dbPool';
+import { dbPool } from '../../dbPool.js';
 import {
   type Credentials,
   type User,
   type UserResponse,
-} from '../../types/User.d';
+} from '../../types/User.d.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import config from '../../config';
+import config from '../../config.js';
 
 // hashing
 

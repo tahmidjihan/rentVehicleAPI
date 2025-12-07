@@ -1,7 +1,7 @@
 // import { signin, signup } from './auth.service';
-import type { Credentials } from '../../types/User';
+import type { Credentials } from '../../types/User.d.js';
 import express from 'express';
-import service from './auth.service';
+import service from './auth.service.js';
 
 async function signup(req: express.Request, res: express.Response) {
   const user = await req.body.user;

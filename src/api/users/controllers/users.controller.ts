@@ -1,8 +1,8 @@
-import { dbPool } from '../../../dbPool';
+import { dbPool } from '../../../dbPool.js';
 import express from 'express';
-import type { UserResponse } from '../../../types/User';
-import services from '../services/user.service';
-import adminService from '../services/admin.service';
+import type { UserResponse } from '../../../types/User.d.js';
+import services from '../services/user.service.js';
+import adminService from '../services/admin.service.js';
 
 // GET users
 async function getUsers(req: express.Request, res: express.Response) {

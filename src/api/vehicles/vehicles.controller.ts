@@ -1,8 +1,8 @@
 import { dbPool } from '../../dbPool';
 import express from 'express';
-import type { Vehicle } from '../../types/vehicle';
-import type { UserResponse } from '../../types/User';
-import services from './vehicles.service';
+import type { Vehicle } from '../../types/vehicle.d.js';
+import type { UserResponse } from '../../types/User.d.js';
+import services from './vehicles.service.js';
 // vehicles GET
 async function getVehicles(req: express.Request, res: express.Response) {
   const data = await services.getVehicles();

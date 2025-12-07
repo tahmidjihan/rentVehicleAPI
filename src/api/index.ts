@@ -1,9 +1,9 @@
 import express from 'express';
-import auth from './auth';
-import vehicles from './vehicles';
-import users from './users';
-import bookings from './bookings';
-import authorize from './auth/auth.middleware';
+import auth from './auth/index.js';
+import vehicles from './vehicles/index.js';
+import users from './users/index.js';
+import bookings from './bookings/index.js';
+import authorize from './auth/auth.middleware.js';
 const router = express.Router();
 
 router.get('/', (req, res) => {

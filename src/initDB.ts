@@ -1,4 +1,4 @@
-import { dbPool } from './dbPool';
+import { dbPool } from './dbPool.js';
 
 function initDB() {
   dbPool.query(

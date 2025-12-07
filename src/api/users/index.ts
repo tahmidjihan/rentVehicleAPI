@@ -1,12 +1,6 @@
 import express from 'express';
-import {
-  deleteUser,
-  getAllUsers,
-  updateUser as updateUserByAdmin,
-} from './services/admin.service';
-import type { UserResponse } from '../../types/User';
-import { updateUser } from './services/user.service';
-import controller from './controllers/users.controller';
+
+import controller from './controllers/users.controller.js';
 
 const router = express.Router();
 

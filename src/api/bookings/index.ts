@@ -1,10 +1,10 @@
 import express from 'express';
-import type { UserResponse } from '../../types/User';
+
 // import {
 //   getBookingsByAdmin,
 //   putBookingByAdmin,
 // } from './controllers/bookings.admin.controller';
-import controller from './controllers/bookings.controller';
+import controller from './controllers/bookings.controller.js';
 const router = express.Router();
 
 // router.use('/', (req, res) => {

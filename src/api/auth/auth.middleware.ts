@@ -1,6 +1,6 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import config from '../../config';
+import config from '../../config.js';
 
 function verifyToken(token: string) {
   return jwt.verify(token, config.JWT_SECRET);
