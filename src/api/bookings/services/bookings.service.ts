@@ -2,12 +2,21 @@ import { dbPool } from '../../../dbPool.js';
 
 async function getBookings(userId: number) {
   const data = await dbPool.query(
-    'SELECT * FROM bookings WHERE customer_id = $1',
+    `SELECT b.* 
+    json_build_object(
+     'vehicle_name' , v.vehicle_name,
+     'registration_number' , v.registration_number,
+     'type' , v.type
+     ) AS vehicle 
+    FROM bookings b
+    LEFT JOIN vehicles v ON b.vehicle_id = v.id
+    WHERE customer_id = $1
+    `,
     [userId]
   );
   return data;
 }
-async function isBooked(vehicleId: number) {
+async function vehicleToBook(vehicleId: number) {
   const data = await dbPool.query('SELECT * FROM vehicles WHERE id = $1', [
     vehicleId,
   ]);
@@ -94,6 +103,7 @@ async function putBooking(id: number, status: string) {
     'UPDATE vehicles SET availability_status = $1 WHERE id = $2 RETURNING *',
     ['returned', id]
   );
+  console.log(updateVehicle.rows);
   if (dataUpdate && updateVehicle) {
     const data = await dbPool.query('SELECT * FROM bookings WHERE id = $1', [
       id,
@@ -102,4 +112,10 @@ async function putBooking(id: number, status: string) {
   }
 }
 // async function cancelBooking(id: number) {}
-export default { getBookings, isBooked, addBooking, checkUser, putBooking };
+export default {
+  getBookings,
+  vehicleToBook,
+  addBooking,
+  checkUser,
+  putBooking,
+};

@@ -33,14 +33,7 @@ async function getBookings(req: express.Request, res: express.Response) {
 async function addBooking(req: express.Request, res: express.Response) {
   const { customer_id, vehicle_id, rent_start_date, rent_end_date } = req.body;
 
-  const vehicle = await services.isBooked(vehicle_id);
-  if (vehicle.success === false) {
-    res.send({
-      success: false,
-      message: 'Error : Vehicle is currently booked',
-      error: vehicle.message,
-    });
-  }
+  const vehicle = await services.vehicleToBook(vehicle_id);
   const times = {
     start: new Date(rent_start_date).getTime() / 1000 / 60 ** 2 / 24,
     end: new Date(rent_end_date).getTime() / 1000 / 60 ** 2 / 24,
