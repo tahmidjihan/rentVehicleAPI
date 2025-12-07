@@ -3,6 +3,7 @@ import { dbPool } from '../../../dbPool';
 import type { UserResponse } from '../../../types/User';
 import type { Vehicle } from '../../../types/vehicle';
 import services from '../services/bookings.service';
+import adminServices from '../services/bookings.admin.service';
 
 // bookings GET
 async function getBookings(req: express.Request, res: express.Response) {
@@ -19,12 +20,8 @@ async function getBookings(req: express.Request, res: express.Response) {
   }
   // ? here admin logic should go
   // const data = await services.getBookings();
-  const result = {
-    success: true,
-    message: 'Bookings fetched successfully',
-    // data: data.rows,
-  };
-  res.send(result);
+
+  res.send(await adminServices.getBookings());
 }
 
 async function addBooking(req: express.Request, res: express.Response) {
@@ -65,49 +62,69 @@ async function addBooking(req: express.Request, res: express.Response) {
     return;
   }
 }
-async function putBooking(req: express.Request) {
+async function putBooking(req: express.Request, res: express.Response) {
   const { status } = req.body;
-  const id = req.params.id;
+  const bookingId = req.params.bookingId;
   const user = req?.user as UserResponse;
-  if (status == 'cancelled') {
-    // console.log('passed 1st layer');
-    try {
-      const data = await dbPool.query('SELECT * FROM bookings WHERE id = $1', [
-        id,
-      ]);
-      if (data.rows[0].customer_id !== user.id) {
-        console.log('forbade');
-        return 'Forbidden';
-      }
-      console.log(data.rows[0].customer_id);
-      console.log(user.id + 'is the real one');
-      console.log('granted');
-      const dataUpdate = await dbPool.query(
-        'UPDATE bookings SET status = $1 WHERE id = $2 RETURNING *',
-        [status, id]
-      );
-      const updateVehicle = await dbPool.query(
-        'UPDATE vehicles SET availability_status = $1 WHERE id = $2 RETURNING *',
-        ['returned', id]
-      );
-      if (dataUpdate && updateVehicle) {
-        const data = await dbPool.query(
-          'SELECT * FROM bookings WHERE id = $1',
-          [id]
+  // console.log(bookingId);
+  // console.log(user.role);
+  if (user.role !== 'admin') {
+    if (status == 'cancelled') {
+      try {
+        const data = await services.checkUser(
+          Number(bookingId),
+          Number(user.id)
         );
-        // ? have to make more changes according documentation
-        // TODO I have to remove few things from the response
-        const result = {
-          success: true,
-          message: 'Booking cancelled successfully now',
-          data: { ...data.rows[0], status: 'cancelled' },
-        };
-        return result;
+        if (data.success === false) {
+          return res.status(403).send('Forbidden');
+        }
+        const dataUpdate = await services.putBooking(Number(bookingId), status);
+        if (dataUpdate) {
+          // ? have to make more changes according documentation
+          // TODO I have to remove few things from the response
+          const result = {
+            success: true,
+            message: 'Booking cancelled successfully now',
+            data: { ...dataUpdate.rows[0], status: 'cancelled' },
+          };
+          res.send(result);
+          return result;
+        }
+      } catch (err) {
+        console.log(err);
+        res.send({
+          success: false,
+          message: 'Error',
+          error: err,
+        });
+        return 'error';
       }
-    } catch (err) {
-      console.log(err);
-      return 'error';
     }
+  }
+  try {
+    // console.log(bookingId);
+    const dataUpdate = await adminServices.putBooking(
+      status,
+      Number(bookingId)
+    );
+    if (dataUpdate) {
+      // ? have to make more changes according documentation
+      // TODO I have to remove few things from the response
+      const result = {
+        success: true,
+        message: 'Booking cancelled successfully now',
+        data: { ...dataUpdate.rows[0] },
+      };
+      res.send(result);
+      return result;
+    }
+  } catch (error) {
+    console.log(error);
+    res.send({
+      success: false,
+      message: 'Error',
+      error: error,
+    });
   }
 }
 export default { getBookings, addBooking, putBooking };

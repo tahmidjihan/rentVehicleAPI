@@ -2,19 +2,18 @@ import express from 'express';
 import { dbPool } from '../../../dbPool';
 import type { UserResponse } from '../../../types/User';
 
-export async function getBookingsByAdmin() {
+async function getBookings() {
   const data = await dbPool.query('SELECT * FROM bookings');
   return {
-    status: 'success',
+    success: true,
     message: 'Bookings fetched successfully',
     data: data.rows,
   };
 }
-export async function putBookingByAdmin(req: express.Request) {
-  const { status } = req.body;
-  const id = req.params.bookingId;
-
+async function putBooking(status: string, id: number) {
+  // console.log('status' + status + ', id: ' + id);
   if (status === 'returned') {
+    console.log('its admin');
     try {
       const dataUpdated = await dbPool.query(
         'UPDATE bookings SET status = $1 WHERE id = $2 RETURNING *',
@@ -25,20 +24,13 @@ export async function putBookingByAdmin(req: express.Request) {
           'UPDATE vehicles SET availability_status = $1 WHERE id = $2 RETURNING *',
           ['returned', id]
         );
-        if (updateVehicle) {
-          const data = await dbPool.query(
-            'SELECT * FROM bookings WHERE id = $1',
-            [id]
-          );
-          // ? have to make more changes according documentation
-          // TODO I have to remove few things from the response
-          const result = {
-            success: true,
-            message: 'Booking returned successfully',
-            data: { ...data.rows[0], status: 'returned' },
-          };
-          return result;
-        }
+
+        const data = await dbPool.query(
+          'SELECT * FROM bookings WHERE id = $1',
+          [id]
+        );
+        // console.log(data);
+        return data;
       }
 
       // return data.rows[0];
@@ -47,3 +39,7 @@ export async function putBookingByAdmin(req: express.Request) {
     }
   }
 }
+export default {
+  getBookings,
+  putBooking,
+};

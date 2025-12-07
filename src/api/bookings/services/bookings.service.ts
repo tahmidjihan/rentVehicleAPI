@@ -1,4 +1,5 @@
 import { dbPool } from '../../../dbPool';
+import type { User } from '../../../types/User';
 
 async function getBookings(userId: number) {
   const data = await dbPool.query(
@@ -59,5 +60,47 @@ async function addBooking(data: any) {
   };
   // return result;
 }
+// check is user
+async function checkUser(id: number, userId: number) {
+  const data = await dbPool.query('SELECT * FROM bookings WHERE id = $1', [id]);
+
+  if (!data.rows[0]) {
+    return {
+      success: false,
+      message: 'Booking not found',
+      error: 'Booking not found',
+    };
+  }
+  if (data.rows[0].customer_id !== userId) {
+    //  console.log('forbade');
+    return {
+      success: false,
+      message: 'Forbidden',
+      error: 'Forbidden',
+    };
+  }
+  return {
+    success: true,
+    message: 'Granted',
+    data: data.rows[0],
+  };
+}
+// booking PUT
+async function putBooking(id: number, status: string) {
+  const dataUpdate = await dbPool.query(
+    'UPDATE bookings SET status = $1 WHERE id = $2 RETURNING *',
+    [status, id]
+  );
+  const updateVehicle = await dbPool.query(
+    'UPDATE vehicles SET availability_status = $1 WHERE id = $2 RETURNING *',
+    ['returned', id]
+  );
+  if (dataUpdate && updateVehicle) {
+    const data = await dbPool.query('SELECT * FROM bookings WHERE id = $1', [
+      id,
+    ]);
+    return data;
+  }
+}
 // async function cancelBooking(id: number) {}
-export default { getBookings, isBooked, addBooking };
+export default { getBookings, isBooked, addBooking, checkUser, putBooking };
