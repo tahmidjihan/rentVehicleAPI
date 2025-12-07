@@ -105,6 +105,8 @@ async function putBooking(req: express.Request, res: express.Response) {
         });
         return 'error';
       }
+    } else {
+      return res.status(403).send('Forbidden');
     }
   }
   try {
