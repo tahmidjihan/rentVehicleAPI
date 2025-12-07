@@ -17,3 +17,4 @@ export async function updateUser(req: express.Request) {
     return { status: 'success' };
   }
 }
+export default { updateUser };

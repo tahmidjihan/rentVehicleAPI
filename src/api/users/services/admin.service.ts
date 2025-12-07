@@ -6,9 +6,9 @@ export async function getAllUsers() {
   const data = await dbPool.query('SELECT * FROM users');
   return data.rows;
 }
-export async function updateUserByAdmin(req: express.Request) {
+export async function updateUser(user: any) {
   // const user = req?.user as UserResponse;
-  const { id, name, email, phone, role } = req.body.user;
+  const { id, name, email, phone, role } = user;
 
   const data = await dbPool.query(
     'UPDATE users SET name = $1, email = $2, phone = $3, role = $4 WHERE id = $5',
@@ -16,31 +16,28 @@ export async function updateUserByAdmin(req: express.Request) {
   );
   // console.log(data);
   if (data) {
-    return { status: 'success' };
+    return { success: true, message: 'User updated successfully' };
   }
 }
-export async function deleteUser(req: express.Request, res: express.Response) {
-  const user = req?.user as UserResponse;
-  if (user?.role !== 'admin') {
-    res.status(401).send('Access denied');
-  }
-
-  const userId = req.params.userId;
-
+export async function deleteUser(userId: number) {
   const bookingData = await dbPool.query(
     'SELECT * FROM bookings WHERE customer_id = $1',
     [userId]
   );
   if (bookingData.rows.length > 0) {
-    // return { status: 'error', message: 'User has active bookings' };
     bookingData.rows.forEach((booking) => {
       if (booking.status === 'booked') {
-        res.status(400).send('User has active bookings');
-        return;
+        return 'User has active bookings';
       }
     });
   }
 
   const data = await dbPool.query('DELETE FROM users WHERE id = $1', [userId]);
-  res.send({ status: 'success', message: 'User deleted successfully' });
+  // res.send({ status: 'success', message: 'User deleted successfully' });
+  return { success: true, message: 'User deleted successfully' };
 }
+export default {
+  getAllUsers,
+  updateUser,
+  deleteUser,
+};
