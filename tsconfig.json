@@ -8,18 +8,25 @@
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
     // "module": "nodenext",
-    "target": "esnext",
+    // "target": "esnext",
     // "types": [],
     // For nodejs:
     // "lib": ["esnext"],
     "types": ["node"],
     // and npm install -D @types/node
-
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    // "outDir": "dist",
+    "target": "ES2022",
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
     // Other Outputs
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
-    "moduleResolution": "bundler",
+    // "moduleResolution": "bundler",
 
     // Stricter Typechecking Options
     "noUncheckedIndexedAccess": true,
@@ -34,12 +41,11 @@
     // "noPropertyAccessFromIndexSignature": true,
 
     // Recommended Options
-    "strict": true,
+
     // "jsx": "react-jsx",
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
-    "moduleDetection": "force",
-    "skipLibCheck": true
+    "moduleDetection": "force"
   }
 }

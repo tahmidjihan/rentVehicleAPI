@@ -1,5 +1,5 @@
 // import { signin, signup } from './auth.service';
-import type { Credentials } from '../../types/User.d.js';
+import type { Credentials } from '../../types/User.js';
 import express from 'express';
 import service from './auth.service.js';
 

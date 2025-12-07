@@ -1,6 +1,6 @@
 import { dbPool } from '../../../dbPool.js';
 import express from 'express';
-import type { UserResponse } from '../../../types/User.d.js';
+import type { UserResponse } from '../../../types/User.js';
 
 export async function getAllUsers() {
   const data = await dbPool.query('SELECT * FROM users');

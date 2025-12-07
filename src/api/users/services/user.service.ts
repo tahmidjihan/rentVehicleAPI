@@ -1,6 +1,6 @@
 import { dbPool } from '../../../dbPool.js';
 import express from 'express';
-import type { UserResponse } from '../../../types/User.d.js';
+import type { UserResponse } from '../../../types/User.js';
 
 export async function updateUser(req: express.Request) {
   const user = req?.user as UserResponse;

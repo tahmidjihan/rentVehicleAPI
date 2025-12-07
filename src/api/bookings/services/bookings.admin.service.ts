@@ -1,4 +1,3 @@
-import express from 'express';
 import { dbPool } from '../../../dbPool.js';
 
 async function getBookings() {

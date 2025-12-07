@@ -1,5 +1,5 @@
 import express from 'express';
-import type { UserResponse } from '../../../types/User.d.js';
+import type { UserResponse } from '../../../types/User.js';
 // import type { Vehicle } from '../../../types/vehicle';
 import services from '../services/bookings.service.js';
 import adminServices from '../services/bookings.admin.service.js';

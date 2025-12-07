@@ -1,5 +1,4 @@
 import { dbPool } from '../../../dbPool.js';
-import type { User } from '../../../types/User';
 
 async function getBookings(userId: number) {
   const data = await dbPool.query(

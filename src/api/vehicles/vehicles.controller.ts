@@ -1,7 +1,6 @@
-import { dbPool } from '../../dbPool';
 import express from 'express';
-import type { Vehicle } from '../../types/vehicle.d.js';
-import type { UserResponse } from '../../types/User.d.js';
+import type { Vehicle } from '../../types/vehicle.js';
+import type { UserResponse } from '../../types/User.js';
 import services from './vehicles.service.js';
 // vehicles GET
 async function getVehicles(req: express.Request, res: express.Response) {
