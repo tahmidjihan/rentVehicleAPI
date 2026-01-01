@@ -50,6 +50,7 @@ export async function deleteUser(req: express.Request, res: express.Response) {
   const user = req?.user as UserResponse;
   if (user?.role !== 'admin') {
     res.status(401).send('Access denied');
+    return;
   }
 
   const userId = req.params.userId;

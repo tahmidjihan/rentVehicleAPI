@@ -80,6 +80,7 @@ export async function deleteVehicle(
   const user = req?.user as UserResponse;
   if (user?.role !== 'admin') {
     res.status(403).send('Unauthorized');
+    return;
   }
   try {
     const id = Number(req.params.vehicleId) as number;
