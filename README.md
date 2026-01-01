@@ -71,6 +71,7 @@ npm install
 ```
 
 This will install all required dependencies including:
+
 - Express.js
 - TypeScript
 - PostgreSQL driver (pg)
@@ -226,6 +227,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -253,6 +255,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -443,11 +446,13 @@ This project is configured for deployment on **Vercel**.
 ### Deploy to Vercel
 
 1. Install Vercel CLI:
+
 ```bash
 npm i -g vercel
 ```
 
 2. Deploy:
+
 ```bash
 vercel
 ```
@@ -470,31 +475,35 @@ vercel
 You can test the API using:
 
 ### 1. **Postman** or **Insomnia**
-   - Import the endpoints
-   - Set up environment variables for base URL and token
+
+- Import the endpoints
+- Set up environment variables for base URL and token
 
 ### 2. **cURL**
-   ```bash
-   # Register user
-   curl -X POST http://localhost:3000/api/v1/auth/register \
-     -H "Content-Type: application/json" \
-     -d '{"name":"Test User","email":"test@example.com","password":"test123","phone":"1234567890","role":"user"}'
-   
-   # Login
-   curl -X POST http://localhost:3000/api/v1/auth/login \
-     -H "Content-Type: application/json" \
-     -d '{"email":"test@example.com","password":"test123"}'
-   ```
+
+```bash
+# Register user
+curl -X POST http://localhost:3000/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Test User","email":"test@example.com","password":"test123","phone":"1234567890","role":"user"}'
+
+# Login
+curl -X POST http://localhost:3000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"test123"}'
+```
 
 ### 3. **Thunder Client** (VS Code Extension)
-   - Install Thunder Client extension
-   - Create requests within VS Code
+
+- Install Thunder Client extension
+- Create requests within VS Code
 
 ---
 
 ## 🔧 Common Issues & Solutions
 
 ### Issue: Database Connection Error
+
 **Solution**: Verify PostgreSQL is running and credentials in `.env` are correct
 
 ```bash
@@ -503,6 +512,7 @@ sudo systemctl status postgresql
 ```
 
 ### Issue: Port Already in Use
+
 **Solution**: Change the PORT in `.env` or kill the process using the port
 
 ```bash
@@ -511,7 +521,9 @@ lsof -ti:3000 | xargs kill -9
 ```
 
 ### Issue: JWT Token Invalid
+
 **Solution**: Ensure you're passing the correct token format:
+
 ```
 Authorization: Bearer your_token_here
 ```
@@ -539,15 +551,8 @@ This project is licensed under the ISC License.
 ## 👨‍💻 Author
 
 **Tahmid Jihan**
+
 - GitHub: [@tahmidjihan](https://github.com/tahmidjihan)
-
----
-
-## 📞 Support
-
-If you have any questions or need help, please:
-- Open an issue on GitHub
-- Contact via email (add your email here if desired)
 
 ---
 
