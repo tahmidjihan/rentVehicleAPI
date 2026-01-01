@@ -28,7 +28,8 @@ async function updateUser(req: express.Request, res: express.Response) {
   if (user?.role !== 'admin') {
     if (user?.email !== body.email && user) {
       //  return 'Forbidden';
-      res.status(401).send('Access denied');
+      res.status(403).send('Unauthorized Access');
+      return;
     }
     // res.status(401).send('Access denied');
     res.send(await services.updateUser(body, Number(id)));

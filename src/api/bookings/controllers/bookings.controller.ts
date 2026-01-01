@@ -32,7 +32,12 @@ async function getBookings(req: express.Request, res: express.Response) {
 
 async function addBooking(req: express.Request, res: express.Response) {
   const { customer_id, vehicle_id, rent_start_date, rent_end_date } = req.body;
-
+  const user = req?.user as UserResponse;
+  if (user?.role !== 'admin') {
+    if (Number(customer_id) !== Number(user.id)) {
+      return res.status(403).send('Unauthorized Access');
+    }
+  }
   const vehicle = await services.vehicleToBook(vehicle_id);
   const times = {
     start: new Date(rent_start_date).getTime() / 1000 / 60 ** 2 / 24,
@@ -83,6 +88,17 @@ async function putBooking(req: express.Request, res: express.Response) {
         );
         if (data.success === false) {
           return res.status(403).send('Forbidden');
+        }
+        const vehicle = await services.vehicleToBook(
+          Number(data.data.vehicle_id)
+        );
+        const time = new Date().toISOString().slice(0, 10);
+        if (Date.parse(data.data.start_date) <= Date.parse(time)) {
+          return res.send({
+            success: false,
+            message:
+              'Cannot cancel booking on the same day or rental start date',
+          });
         }
         const dataUpdate = await services.putBooking(Number(bookingId), status);
         if (dataUpdate) {

@@ -45,13 +45,19 @@ async function putVehicle(id: number, vehicle: any) {
     `UPDATE vehicles SET ${query} WHERE id = $${values.length + 1} RETURNING *`,
     [...values, id]
   );
-
+  if (data.rows.length === 0) {
+    throw new Error('Vehicle not found');
+  }
   // console.log(data);
   return data;
 }
 async function deleteVehicle(id: number) {
   const data = await dbPool.query('DELETE FROM vehicles WHERE id = $1', [id]);
-  return data;
+  if (data) {
+    return data;
+  } else {
+    throw new Error('Vehicle not found');
+  }
 }
 async function checkVehicleBooking(id: number) {
   const bookings = await dbPool.query('SELECT * FROM vehicles WHERE id = $1', [

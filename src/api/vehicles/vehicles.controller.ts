@@ -49,6 +49,7 @@ async function postVehicle(req: express.Request, res: express.Response) {
     res.status(201).send(result);
   } catch (err) {
     console.log(err);
+    res.status(500).send('Internal server error');
   }
 }
 
@@ -76,19 +77,28 @@ export async function deleteVehicle(
   req: express.Request,
   res: express.Response
 ) {
-  const id = Number(req.params.vehicleId) as number;
-  const isBooked = await services.checkVehicleBooking(id);
-  if (isBooked) {
-    return res
-      .status(400)
-      .send({ status: 'error', message: 'Vehicle is currently booked' });
+  const user = req?.user as UserResponse;
+  if (user?.role !== 'admin') {
+    res.status(403).send('Unauthorized');
   }
-  const data = await services.deleteVehicle(id);
+  try {
+    const id = Number(req.params.vehicleId) as number;
+    const isBooked = await services.checkVehicleBooking(id);
+    if (isBooked) {
+      return res
+        .status(400)
+        .send({ status: 'error', message: 'Vehicle is currently booked' });
+    }
+    const data = await services.deleteVehicle(id);
 
-  res.send({
-    success: true,
-    message: 'Vehicle deleted successfully',
-  });
+    res.send({
+      success: true,
+      message: 'Vehicle deleted successfully',
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Internal server error');
+  }
 }
 export default {
   getVehicles,

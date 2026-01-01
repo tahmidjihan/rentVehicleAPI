@@ -4,8 +4,8 @@ import controller from './vehicles.controller.js';
 
 const router = express.Router();
 
-router.get('/', auth, controller.getVehicles);
-router.get('/:vehicleId', auth, controller.getVehicle);
+router.get('/', controller.getVehicles);
+router.get('/:vehicleId', controller.getVehicle);
 router.post('/', auth, controller.postVehicle);
 router.put('/:vehicleId', auth, controller.putVehicle);
 router.delete('/:vehicleId', auth, controller.deleteVehicle);
